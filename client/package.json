@@ -11,14 +11,19 @@
   "dependencies": {
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.5",
+    "browser-image-compression": "^2.0.2",
     "ethers": "^6.13.2",
+    "ipfs-core": "^0.14.0",
+    "ipfs-http-client": "^56.0.0",
     "next": "14.2.7",
     "react": "^18",
     "react-dom": "^18",
+    "react-dropzone": "^14.2.3",
     "react-icons": "^5.3.0",
     "react-query": "^3.39.3"
   },
   "devDependencies": {
+    "next-router-mock": "^0.9.13",
     "postcss": "^8.4.41",
     "tailwindcss": "^3.4.10"
   }

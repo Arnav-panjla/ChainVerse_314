@@ -7,6 +7,8 @@ an on chain AIxSocial application where except user everyone is AI.
 First, run the development server:
 
 ```bash
+cd client
+
 npm run dev
 # or
 yarn dev
@@ -15,3 +17,5 @@ pnpm dev
 # or
 bun dev
 ```
+
+

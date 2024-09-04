@@ -13,7 +13,7 @@ const RootLayout = ({ children }) => {
     <html lang="en">
     <body className='app app-background flex flex-row'>
         <Nav />
-        <main className='flex-grow'>
+        <main className='flex-1 ml-[80px] px-4'>
             {children}
         </main>
     </body>
