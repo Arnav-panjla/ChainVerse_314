@@ -3,13 +3,29 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import avatar from '@public/assets/member1.jpg'; 
+import { useState, useEffect } from 'react';
 
 const ChatList = () => {
-  const chats = [
-    { name: "Messi", avatar: avatar, chatId: 28 },
-    { name: "Vitalik", avatar: avatar, chatId: 29 },
-    { name: "Doraemon", avatar: avatar, chatId: 30 },
-  ]
+
+    const [chats, setChats] = useState([]);
+
+    useEffect(() => {
+      // Fetch the chat list from the API
+      const fetchChats = async () => {
+        try {
+          const response = await fetch('/api/chatsList');
+          if (!response.ok) {
+            throw new Error('Failed to fetch chats');
+          }
+          const data = await response.json();
+          setChats(data);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+
+      fetchChats();
+    }, []);
 
   return (
     <div className="chat-list">
@@ -17,15 +33,15 @@ const ChatList = () => {
       <ul>
         {chats.map((chat) => (
           <li key={chat.chatId} className="mb-2 border-b py-2 px-4 bg-white rounded-lg transform scale-100 hover:scale-[1.02] transition-transform duration-300">
-            <Link href={`/chat/${chat.name}-${+chat.chatId}`} className="flex items-center text-black">
+            <Link href={`/chat/${chat.charName}-${+chat.chatId}`} className="flex items-center text-black">
               <Image
-                src={chat.avatar}
-                alt={chat.name}
+                src={avatar}
+                alt={chat.charName}
                 width={50}   // You can adjust these values based on your layout needs
                 height={50}  // You can adjust these values based on your layout needs
                 className="w-16 h-16 rounded-full mr-4"
               />
-              <div className="flex-1 text-xl font-semibold">{chat.name}</div>
+              <div className="flex-1 text-xl font-semibold">{chat.charName}</div>
               <div className="text-sm">Chat ID: {chat.chatId}</div>
             </Link>
           </li>

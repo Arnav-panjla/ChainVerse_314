@@ -2,10 +2,13 @@ import {Contract, ethers, TransactionReceipt, Wallet} from "ethers";
 import { NextResponse } from 'next/server';
 import ABI from '@/contracts/ChatGpt.json';
 
+import { addChat } from '@/lib/db';
+import { createTable } from '@/lib/db';
+
 export async function POST(request) {
   try {
-    const { message } = await request.json();
-    console.log('Received request:', { message });
+    const { charName } = await request.json();
+    console.log('Received request:', { charName });
 
     const rpcUrl = process.env.RPC_URL;
     const privateKey = process.env.PRIVATE_KEY;
@@ -19,16 +22,8 @@ export async function POST(request) {
     const wallet = new ethers.Wallet(privateKey, provider);
     const contract = new ethers.Contract(contractAddress, ABI, wallet);
 
-    // // Check if the contract has the startChat function
-    // if (!contract.functions.startChat) {
-    //     throw new Error('startChat function not found in the contract. Verify ABI and contract address.');
-    //   }
-  
-    //   // Estimate gas before sending the transaction
-    //   const gasEstimate = await contract.estimateGas.startChat(message);
-    //   console.log('Gas estimate:', gasEstimate.toString());
-  
-    // Send the transaction
+    const message = `You are an ${charName} simulating the role of my friend, in a friendly, engaging, and authentic manner. lets start with a simple Hi!`
+
     const tx = await contract.startChat(message);
     console.log('Transaction sent:', tx.hash);
 
@@ -39,6 +34,9 @@ export async function POST(request) {
     // Extract the chatId from the logs
     const chatId = getChatId(receipt, contract);
     console.log('Chat ID:', chatId);
+    
+    createTable();
+    addChat(charName, chatId);
 
     return NextResponse.json({ chatId });
 

@@ -3,41 +3,48 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 import avatar from '@public/assets/member1.jpg';
 
-
-
 export default function Chat() {
   const [chatId, setChatId] = useState(0);
   const [character, setCharacter] = useState('');
-  const [nature, setNature] = useState([]);
-  const [responses, setResponses] = useState([]);
-  const [chatStarted, setChatStarted] = useState(false);
+  const [nature, setNature] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Capitalize each word in a string
+  const capitalizeWords = (str) => {
+    return str
+        .split(" ")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+  };
 
-
+  // Handle the form submission
   const handleStartChat = async (event) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
+
+    // Capitalize the character name
+    const formattedCharacter = capitalizeWords(character);
+    setCharacter(formattedCharacter);
+
     try {
       const response = await fetch('/api/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          message: `You are an ${character} simulating the role of my friend, in a friendly, engaging, and authentic manner. lets start with a simple Hi!`
-        }),
+        body: JSON.stringify({ charName: formattedCharacter }),
       });
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+
       const data = await response.json();
       console.log('Start chat response:', data);
       setChatId(data.chatId);
-      // setResponses(prev => [...prev, ...(message ? [{ role: 'user', content: message }] : []), ...data.latestMessage]);
-      setChatStarted(true);
+
     } catch (error) {
       console.error('Error starting chat:', error);
       setError('Failed to start chat. Please try again.');
@@ -46,23 +53,31 @@ export default function Chat() {
     }
   };
 
+  // Handle reset form
+  const handleReset = () => {
+    setCharacter('');
+    setNature('');
+    setChatId(0);
+    setError(null);
+  };
+
   return (
-    <div className="flex flex-col items-center ">
+    <div className="flex flex-col items-center">
       <h1 className="text-2xl text-white font-bold mb-8">
-        Add a new person
+        Add a New Person
       </h1>
       <Image
-                src={avatar}
-                alt={character}
-                width={200}   // You can adjust these values based on your layout needs
-                height={200}  // You can adjust these values based on your layout needs
-                className=" rounded-full mr-4"
-              />
+        src={avatar}
+        alt={character}
+        width={200}
+        height={200}
+        className="rounded-full mb-4"
+      />
       <div className="w-[75vw] bg-transparent p-4 rounded-lg shadow-md">
         {error && <div className="text-red-500 mb-2">{error}</div>}
         
         <form onSubmit={handleStartChat} className="flex flex-col space-y-4">
-        <input
+          <input
             type="text"
             value={character}
             onChange={(e) => setCharacter(e.target.value)}
@@ -78,17 +93,28 @@ export default function Chat() {
             rows={3}
           />
           
-          <button type="submit" className="bg-blue-500 text-white p-2 rounded-lg" disabled={isLoading}>
+          <button
+            type="submit"
+            className="bg-blue-500 text-white p-2 rounded-lg"
+            disabled={isLoading}
+          >
             {isLoading ? 'Starting Chat...' : 'Start Chat'}
           </button>
         </form>
         
-        {chatId!==0 && <p className="text-green-500 mb-2">
-          character added sucessfully:
-          {character} 
-          Id-{chatId}
-        </p>}
-        
+        {chatId !== 0 && (
+          <div className="text-green-500 mb-2">
+            Character added successfully: {character} <br />
+            ID: {chatId}
+          </div>
+        )}
+
+        <button
+          onClick={handleReset}
+          className="bg-gray-500 text-white p-2 rounded-lg mt-4"
+        >
+          Reset
+        </button>
       </div>
     </div>
   );
