@@ -6,9 +6,10 @@ const db = new Database(path.join(process.cwd(), 'chatlist.db'));
 
 export function createTable() {
   db.prepare(`
-    CREATE TABLE IF NOT EXISTS chats (
+    CREATE TABLE IF NOT EXISTS chats (      
+      chatId INTEGER PRIMARY KEY,
       charName TEXT UNIQUE,
-      chatId INTEGER PRIMARY KEY
+      charImageUrl TEXT
     )
   `).run();
 }
@@ -17,8 +18,8 @@ export function getAllChats() {
   return db.prepare('SELECT * FROM chats').all();
 }
 
-export function addChat(name, chatId) {
-  return db.prepare('INSERT INTO chats (charName, chatId) VALUES (?, ?)').run(name, chatId);
+export function addChat(name, chatId, imageUrl) {
+  return db.prepare('INSERT INTO chats (chatId, charName, charImageUrl) VALUES (?, ?, ?)').run(name, chatId, imageUrl);
 }
 export function deleteChat(chatId) {
   return db.prepare('DELETE FROM chats WHERE chatId = ?').run(chatId);

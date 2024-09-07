@@ -35,8 +35,8 @@ const ChatList = () => {
           <li key={chat.chatId} className="mb-2 border-b py-2 px-4 bg-white rounded-lg transform scale-100 hover:scale-[1.02] transition-transform duration-300">
             <Link href={`/chat/${chat.charName}-${+chat.chatId}`} className="flex items-center text-black">
               <Image
-                src={avatar}
-                alt={chat.charName}
+                src={chat.charImageUrl || '/assets/member1.jpg'} // Use fallback if imageUrl is not available
+                alt={chat.charName || 'Default Image'}
                 width={50}   // You can adjust these values based on your layout needs
                 height={50}  // You can adjust these values based on your layout needs
                 className="w-16 h-16 rounded-full mr-4"

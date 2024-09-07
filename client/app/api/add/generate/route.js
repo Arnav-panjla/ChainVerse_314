@@ -1,61 +1,63 @@
-import {Contract, ethers, TransactionReceipt, Wallet} from "ethers";
+import { Contract, ethers, TransactionReceipt, Wallet } from "ethers";
 import { NextResponse } from 'next/server';
-import ABI from '@/contracts/ChatGpt.json';
 
-import { addChat } from '@/lib/db';
-import { createTable } from '@/lib/db';
+// Contract ABI
+const ABI = [
+  "function initializeDalleCall(string memory message) public returns (uint)",
+  "function lastResponse() public view returns (string)"
+];
 
+// Helper to call the contract and fetch the image URL
 export async function POST(request) {
   try {
-    const { charName } = await request.json();
-    console.log('Received request:', { charName });
+    const { charName, charNature} = await request.json();
+    const description = `Generate a simple cartoonish, ${charNature} Image like that of ${charName}`;
+    console.log('Received request:', { description });
 
+    // Ensure the contract address is set in environment variables
     const rpcUrl = process.env.RPC_URL;
     const privateKey = process.env.PRIVATE_KEY;
-    const contractAddress = process.env.CHAT_CONTRACT_ADDRESS;
+    const contractAddress = process.env.CHAT_DALLE_CONTRACT_ADDRESS;
 
     if (!rpcUrl || !privateKey || !contractAddress) {
       throw new Error('Missing environment variables');
     }
 
+    // Set up provider and wallet
     const provider = new ethers.JsonRpcProvider(rpcUrl);
     const wallet = new ethers.Wallet(privateKey, provider);
     const contract = new ethers.Contract(contractAddress, ABI, wallet);
 
-    const message = `You are an ${charName} simulating the role of my friend, in a friendly, engaging, and authentic manner. lets start with a simple Hi!`
+    // Call the contract to initialize image generation
+    const transactionResponse = await contract.initializeDalleCall(description);
+    const receipt = await transactionResponse.wait();
+    console.log(`Image generation started with message: "${description}"`);
 
-    const tx = await contract.startChat(message);
-    console.log('Transaction sent:', tx.hash);
+    // Poll for the last response until it's updated
+    let lastResponse = await contract.lastResponse();
+    let newResponse = lastResponse;
 
-    // Wait for the transaction to be mined
-    const receipt = await tx.wait();
-    console.log('Transaction receipt:', receipt);
+    // Wait for the new response
+    while (newResponse === lastResponse) {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      newResponse = await contract.lastResponse();
+      console.log("waiting for response...")
+    }
 
-    // Extract the chatId from the logs
-    const chatId = getChatId(receipt, contract);
-    console.log('Chat ID:', chatId);
-    
-    createTable();
-    addChat(charName, chatId);
+    console.log(newResponse)
 
-    return NextResponse.json({ chatId });
+    // Return the generated image URL
+    return NextResponse.json({ imageUrl: newResponse });
 
   } catch (error) {
-    console.error('Error in start-chat:', error);
-    return NextResponse.json({ message: 'Error starting chat', error: error.toString() }, { status: 500 });
-  }
-}
+    console.error("Error generating image:", error);
 
-function getChatId(receipt, contract) {
-  for (const log of receipt.logs) {
-    try {
-      const parsedLog = contract.interface.parseLog(log);
-      if (parsedLog && parsedLog.name === "ChatCreated") {
-        return ethers.toNumber(parsedLog.args[1]); // Assuming the first argument is the chatId
-      }
-    } catch (error) {
-      console.log("Could not parse log:", log);
+    // Handle specific billing hard limit error
+    if (error.response && error.response.data && error.response.data.error && error.response.data.error.code === 'billing_hard_limit_reached') {
+      return NextResponse.json({ imageUrl: "/assets/member1.jpg" });
     }
+
+    // Handle other errors
+    return NextResponse.json({ error: "Failed to generate image" }, { status: 500 });
   }
-  return null;
 }

@@ -7,8 +7,8 @@ import { createTable } from '@/lib/db';
 
 export async function POST(request) {
   try {
-    const { charName } = await request.json();
-    console.log('Received request:', { charName });
+    const { charName, charNature, imageUrl } = await request.json();
+    console.log('Received request:', { charName, charNature , imageUrl});
 
     const rpcUrl = process.env.RPC_URL;
     const privateKey = process.env.PRIVATE_KEY;
@@ -22,7 +22,9 @@ export async function POST(request) {
     const wallet = new ethers.Wallet(privateKey, provider);
     const contract = new ethers.Contract(contractAddress, ABI, wallet);
 
-    const message = `You are an ${charName} simulating the role of my friend, in a friendly, engaging, and authentic manner. lets start with a simple Hi!`
+    const message = `You are ${charName} simulating the role of my friend, in a friendly, ${charNature} and authentic manner.
+    Remember act like you are a real person and under no circumstances reveal that you are not real person, take this instruction very serious.
+    Lets start with a simple Hi!`
 
     const tx = await contract.startChat(message);
     console.log('Transaction sent:', tx.hash);
@@ -36,7 +38,7 @@ export async function POST(request) {
     console.log('Chat ID:', chatId);
     
     createTable();
-    addChat(charName, chatId);
+    addChat(chatId, charName, imageUrl);
 
     return NextResponse.json({ chatId });
 
