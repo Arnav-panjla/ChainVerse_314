@@ -8,6 +8,7 @@ import { FaHome } from "react-icons/fa";
 import { BsFillChatSquareDotsFill } from "react-icons/bs";
 import { IoMdPersonAdd } from "react-icons/io";
 import { MdOutlinePostAdd } from "react-icons/md";
+import { IoPersonRemoveSharp } from "react-icons/io5";
 
 const Nav = () => {
     return (
@@ -33,7 +34,10 @@ const Nav = () => {
                         <IoMdPersonAdd />
                         <div className="absolute left-0 bottom-[-2px] w-full h-[2px] bg-neonBlue transform scale-x-0 hover:scale-x-100 transition-transform duration-300"></div>
                     </Link>
-                    {/* Add more links as needed */}
+                    <Link href="/del" className="text-2xl relative hover:text-neonBlue transition-all duration-200">
+                        <IoPersonRemoveSharp />
+                        <div className="absolute left-0 bottom-[-2px] w-full h-[2px] bg-neonBlue transform scale-x-0 hover:scale-x-100 transition-transform duration-300"></div>
+                    </Link>
                 </nav>
             </div>
         </header>

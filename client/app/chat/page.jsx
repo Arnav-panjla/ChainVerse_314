@@ -29,8 +29,8 @@ const ChatList = () => {
 
   return (
     <div className="chat-list">
-      <h1 className="text-4xl font-bold mb-4 text-white text-center ">Chats</h1>
-      <ul>
+      <h1 className="text-4xl font-bold mb-8 mt-6 text-white text-center ">Chats</h1>
+      <ul className='w-[75vw] mx-auto'>
         {chats.map((chat) => (
           <li key={chat.chatId} className="mb-2 border-b py-2 px-4 bg-white rounded-lg transform scale-100 hover:scale-[1.02] transition-transform duration-300">
             <Link href={`/chat/${chat.charName}-${+chat.chatId}`} className="flex items-center text-black">

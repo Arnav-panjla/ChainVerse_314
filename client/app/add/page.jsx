@@ -66,6 +66,9 @@ export default function Chat() {
       setError('Failed to start chat. Please try again.');
     } finally {
       setIsLoading(false);
+      setCharacter('');
+      setNature('');
+      setImageUrl('');
     }
   };
 
@@ -117,7 +120,7 @@ export default function Chat() {
   const handleReset = () => {
     setCharacter('');
     setNature('');
-    setChatId(0);
+    setChatId(-1);
     setError(null);
   };
 
@@ -171,7 +174,7 @@ export default function Chat() {
         
         {chatId !== -1  && (
           <div className="text-green-500 mb-2">
-            Character added successfully: {character} <br />
+            Added successfully: <br />
             ID: {chatId}
           </div>
         )}
