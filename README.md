@@ -23,6 +23,9 @@ Welcome to **ChainVerse_314**, a captivating decentralized social media applicat
   
 - **😊 Expressive Emoji Support**: Enhance your communication with a vibrant library of emojis, allowing you to convey your emotions and reactions effortlessly.
 
+- **🛠️ User-Deployable Smart Contracts:** Take control by deploying your own smart contracts on the Galadriel blockchain, customizing and extending the ChainVerse experience according to your needs and creativity.
+
+
 ---
 
 ## 🧭 **Table of Contents**
@@ -49,22 +52,12 @@ Follow these instructions to set up and run the project locally.
 Ensure the following are installed/present:
 
 - **Node.js** (v16.x or higher)
-- **npm** (v7.x or higher) or **yarn**
-- **MetaMask** or any other Ethereum wallet
+- **Hardhat** (v8.20 latest)
+- **npm** (v7.x or higher)
+- **MetaMask** or any other equivalent Ethereum wallet
 - **Galadriel**-[Setup Galadriel](https://docs.galadriel.com/setting-up-a-wallet)
 - **Tokens**-[How to get Galadriel Tokens](https://docs.galadriel.com/faucet)
 
-### **Environment Variables**
-
-Set up the following in a `.env.local` file:
-
-```bash
-RPC_URL=your_rpc_url_here
-PRIVATE_KEY=your_private_key_here
-CHAT_VISION_CONTRACT_ADDRESS=your_vision_contract_address_here
-CHAT_CONTRACT_ADDRESS=your_contract_address_here
-
-```
 
 ## ⚙️ Installation
 
@@ -77,12 +70,63 @@ cd ChainVerse_314
 
 ## 💻 Usage
 
-Install dependencies:
+### First Time setup
+To be performed only once during the first time when you start
+- setup necesssary enviornment variables
+    ```bash
+    cd deployContracts
+    cp template.env .env
+    ```
+    ```bash
+    # Address of oracle deployed on Galadriel testnet.
+    # See https://docs.galadriel.com/oracle-address
+    ORACLE_ADDRESS="0x..."
 
-```bash
-npm install
-```
+    # Private key to use for deployment on Galadriel testnet
+    PRIVATE_KEY_GALADRIEL="0x..."
 
+    ```
+- Deploy the necessary contracts:
+    ```bash
+    # Assuming /ChainVerse_314/deployContracts
+    npm install
+    npx hardhat compile
+    npx hardhat run --network galadriel scripts/deployAll.ts
+    # Comming back to root
+    cd .. 
+    ```
+- Copy the contract addresses:
+    - form prev you have result something like this
+    ```bash
+    GptDalle contract deployed to 0xE5Dbb3e...
+    OpenAiChatGptVision contract deployed to 0x3Dfd6b...
+    ChatGpt contract deployed to 0x8B039090c7...
+    ```
+    ```bash
+    cd client
+    cp template.env .env
+    ```
+    - paste you deployed contracts in .env file
+    ```bash
+    CHAIN_ID=696969
+    RPC_URL="https://devnet.galadriel.com/"
+
+
+    # Private key to use for deployment on Galadriel testnet
+    PRIVATE_KEY="0x..."
+
+    # GptDAlle contract address 
+    CHAT_DALLE_CONTRACT_ADDRESS="0xE5Dbb3e..."
+
+    # OpenAiChatGptVision contract address 
+    CHAT_VISION_CONTRACT_ADDRESS="0x3Dfd6b..."
+    
+    # ChatGpt contract address 
+    CHAT_CONTRACT_ADDRESS="0x8B039090c7..."
+    ```
+
+
+### Subsequents setup
 Start the development server:
 
 ```bash
@@ -111,12 +155,13 @@ http://localhost:3000
 ## 🛠️ Technologies Used
 
 - Frontend:
-  - Next.js - React framework for server-side rendering
+  - Next.js - This is a Next.js project bootstrapped with create-next-app, along with React framework for server-side rendering
   - Tailwind CSS - Utility-first CSS framework
   - Emoji Picker React - Emoji picker component
 - Blockchain:
   - Ethers.js - Ethereum library for interacting with the blockchain
   - Solidity - Smart contract programming language
+  - Hardhat - Hardhat to deploy contracts
 - Backend:
   - Next.js API Routes - Serverless functions for API endpoints
 
