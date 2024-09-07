@@ -19,6 +19,7 @@ const ChatList = () => {
           }
           const data = await response.json();
           setChats(data);
+
         } catch (error) {
           console.error(error);
         }
