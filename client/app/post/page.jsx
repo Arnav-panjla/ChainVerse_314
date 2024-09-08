@@ -83,7 +83,7 @@ export default function Chat() {
           {processImageUrls(imageUrls).map((imageUrl, index) => (
             <div key={index} className="mb-2 flex justify-center items-center">
               <Image
-                src={imageUrl.trim().startsWith('http') ? imageUrl.trim() : `/public/default-image.jpg`} // Ensure it's a valid URL or fallback
+                src={imageUrl.trim().startsWith('http') ? imageUrl.trim() : '/public/default-image.jpg'}
                 alt={`Image ${index}`}
                 width={250}
                 height={250}

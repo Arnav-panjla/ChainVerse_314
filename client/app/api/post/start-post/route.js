@@ -8,7 +8,7 @@ import { createPostsTable } from '@/lib/db';
 export async function POST(request) {
   try {
     const { chats, imageUrls } = await request.json();
-    console.log('Received request:', {chats, imageUrls });
+    // console.log('Received request:', {chats, imageUrls });
 
     const rpcUrl = process.env.RPC_URL;
     const privateKey = process.env.PRIVATE_KEY;
@@ -23,11 +23,12 @@ export async function POST(request) {
     const contract = new ethers.Contract(contractAddress, ABI, wallet);
 
     const newChats = getRandomChats(chats);
-    console.log(newChats);
+    // console.log(newChats);
 
     let names = newChats.map(chat => chat.charName).join(', ');
+    console.log(names);
 
-    const initialMessage = `You need to act like the following ${names} one by one (each response separated by ---- )simulating the role of my friend. Your task is to comment on the image in less than 50 words, in a friendly, engaging, and authentic manner.`;
+    const initialMessage = `You need to act like the following ${names} one by one (each response separated by ---- followed by the name and then :- ) simulating the role of my friend. Your task is to comment on the image in not more than 50 words, in a friendly, engaging, and authentic manner.`;
 
     const tx = await contract.startChat(initialMessage, imageUrls);
     console.log('Transaction sent:', tx.hash);
@@ -40,7 +41,9 @@ export async function POST(request) {
 
     // Store chatId and image URLs in the posts table
     createPostsTable()
-    await addPost(chatId, ...imageUrls);
+
+    addPost(chatId, ...imageUrls);
+
     console.log('Post added to the database.');
 
     let allMessages = [];
@@ -48,7 +51,7 @@ export async function POST(request) {
     console.log(`New messages_0 received:`, newMessage);
     allMessages.push(newMessage);
 
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 35; i++) {
       newMessage = await getNewMessages(contract, chatId, i);
       console.log(newMessage);
       if (!newMessage.content) {

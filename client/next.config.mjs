@@ -8,6 +8,11 @@ const nextConfig = {
           hostname: 'storage.googleapis.com',
           pathname: '/**',
         },
+        {
+          protocol: 'https',
+          hostname: 'ipfs.io',
+          pathname: '/ipfs/**',
+        },
       ],
     },
   };
