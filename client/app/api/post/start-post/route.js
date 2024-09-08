@@ -1,6 +1,9 @@
+// Import necessary modules and functions
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import ABI from '@/contracts/ChatGptVision.json';
+import { addPost } from '@/lib/db'; // Import the addPost function
+import { createPostsTable } from '@/lib/db';
 
 export async function POST(request) {
   try {
@@ -19,18 +22,12 @@ export async function POST(request) {
     const wallet = new ethers.Wallet(privateKey, provider);
     const contract = new ethers.Contract(contractAddress, ABI, wallet);
 
-
     const newChats = getRandomChats(chats);
     console.log(newChats);
 
-    const modifiedChats = newChats.map(chat => ({
-      ...chat, 
-      charMessage: `You are an ${chat.charName} simulating the role of my friend. Your task is to comment on the image in less than 50 words, in a friendly, engaging, and authentic manner.`, // Modify charName
-    }));
+    let names = newChats.map(chat => chat.charName).join(', ');
 
-    let names = modifiedChats.map(chat => chat.charName).join(', ');
-
-    const initialMessage = `You need to act like the following ${names} one by one (each response seperated by \\n)simulating the role of my friend. Your task is to comment on the image in less than 50 words, in a friendly, engaging, and authentic manner.`
+    const initialMessage = `You need to act like the following ${names} one by one (each response separated by ---- )simulating the role of my friend. Your task is to comment on the image in less than 50 words, in a friendly, engaging, and authentic manner.`;
 
     const tx = await contract.startChat(initialMessage, imageUrls);
     console.log('Transaction sent:', tx.hash);
@@ -41,47 +38,41 @@ export async function POST(request) {
     const chatId = getChatId(receipt, contract);
     console.log('Chat ID:', chatId);
 
+    // Store chatId and image URLs in the posts table
+    createPostsTable()
+    await addPost(chatId, ...imageUrls);
+    console.log('Post added to the database.');
 
     let allMessages = [];
-    // Run the chat loop: read messages and send messages
-    for (let i = 0; i < 5; i++) {
-      console.log(`Iteration ${i + 1}: Sending message...`);
-    
-      const newMessages = await getNewMessages(contract, chatId, allMessages.length);
-      console.log(`New messages received:`, newMessages);
-    
-      if (newMessages.length) {
-        for (const message of newMessages) {
-          console.log(`${message.role}: ${message.content}`);
-          allMessages.push(message);
-    
-          if (allMessages[allMessages.length - 1]?.role === "assistant") {
-            const userMessage = modifiedChats[i].charMessage; // Replace user input with chat message
-            console.log(`Sending user message: "${userMessage}"`);
-    
-            const transactionResponse = await contract.addMessage(userMessage, chatId);
-            console.log('Transaction response:', transactionResponse); // Debugging
-            const receipt = await transactionResponse.wait();
-            console.log(`Message sent, tx hash: ${receipt.transactionHash}`);
-          }
-        }
-      } else {
-        console.log(`No new messages received.`);
+    let newMessage = await getNewMessages(contract, chatId, 0);
+    console.log(`New messages_0 received:`, newMessage);
+    allMessages.push(newMessage);
+
+    for (let i = 0; i < 50; i++) {
+      newMessage = await getNewMessages(contract, chatId, i);
+      console.log(newMessage);
+      if (!newMessage.content) {
+        i--;
       }
-    
+      console.log(newMessage.at(-1)?.role);
+      if (newMessage.at(-1)?.role === "assistant") {
+        allMessages.push(newMessage);
+        break;
+      }
       await new Promise(resolve => setTimeout(resolve, 2000));
+      console.log("waiting..");
     }
+    console.log(`New messages_1 received:`, newMessage);
 
-    console.log(allMessages);
+    const finalResponse = newMessage[1].content;
+    console.log(finalResponse);
 
-    return NextResponse.json({ allMessages, chatId });
+    return NextResponse.json({ finalResponse, chatId });
   } catch (error) {
     console.error('Error in add-message:', error);
     return NextResponse.json({ message: 'Error adding message', error: error.toString() }, { status: 500 });
   }
-
-  }
-  
+}
 
 function getChatId(receipt, contract) {
   for (const log of receipt.logs) {

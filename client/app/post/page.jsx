@@ -39,7 +39,7 @@ export default function Chat() {
     return urls.split('\n').filter(url => url.trim() !== ''); // Return non-empty trimmed URLs
   };
 
-  const handleStartChat = async (event) => {
+  const handleStartPost = async (event) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
@@ -60,12 +60,9 @@ export default function Chat() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      // setChatId(data.chatId);
-      // setResponses(prev => [
-      //   ...prev, 
-      //   ...(message ? [{ role: 'user', content: message }] : []),
-      //   ...data.latestMessage
-      // ]);
+      console.log(data);
+      console.log(data.chatId);
+      console.log(data.finalResponse);
       setChatStarted(true);
       // setImageUrls('');
     } catch (error) {
@@ -96,7 +93,7 @@ export default function Chat() {
           ))}
         </div>
         {error && <div className="text-red-500 mb-2">{error}</div>}
-        <form onSubmit={handleStartChat} className="flex flex-col">
+        <form onSubmit={handleStartPost} className="flex flex-col">
           <textarea
             value={imageUrls}
             onChange={(e) => setImageUrls(e.target.value)}
