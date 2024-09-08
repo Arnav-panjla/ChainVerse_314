@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { NextResponse } from 'next/server';
 import ABI from '@/contracts/ChatGpt.json';
+import { getChatImageUrlByChatId } from '@lib/db';
 
 export async function POST(request) {
   try {
@@ -8,6 +9,11 @@ export async function POST(request) {
     const _chatId = parseInt(chatId, 10);
     chatId = _chatId;
     console.log('Received request:', { chatId });
+
+    const result = getChatImageUrlByChatId(chatId);
+    console.log(`Image URL for chatId ${chatId}: ${result.charImageUrl}`);
+    const charImageUrl = result.charImageUrl
+
 
     const rpcUrl = process.env.RPC_URL;
     const privateKey = process.env.PRIVATE_KEY;
@@ -25,7 +31,7 @@ export async function POST(request) {
     const prevMessages = newMessages.slice(1);
     console.log(prevMessages)
 
-    return NextResponse.json({ prevMessages });
+    return NextResponse.json({ prevMessages, charImageUrl });
 
   } catch (error) {
     console.error('Error in start-chat:', error);

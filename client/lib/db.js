@@ -27,6 +27,9 @@ export function deleteChat(chatId) {
 export function getChatImageUrlByName(charName) {
   return db.prepare('SELECT charImageUrl FROM chats WHERE charName = ?').get(charName);
 }
+export function getChatImageUrlByChatId(chatId) {
+  return db.prepare('SELECT charImageUrl FROM chats WHERE chatId = ?').get(chatId);
+}
 // Function to create 'posts' table if it doesn't exist
 export function createPostsTable() {
   db.prepare(`
