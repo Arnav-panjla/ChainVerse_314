@@ -96,7 +96,7 @@ export default function Chat() {
             value={imageUrls}
             onChange={(e) => setImageUrls(e.target.value)}
             className="border p-2 rounded-lg mb-2"
-            placeholder="Enter image URLs (one per line)"
+            placeholder="Enter image URLs ipfs or google.storage (one link per line) upto 4 images"
             rows={4}
           />
           <button type="submit" className="bg-blue-500 text-white p-2 rounded-lg" disabled={isLoading}>
