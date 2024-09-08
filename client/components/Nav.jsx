@@ -18,7 +18,7 @@ const Nav = () => {
                     <Image src={logo} alt="Logo" className="w-[7vh] h-[7vh] mb-16" />
                 </Link>
                 <nav className="flex flex-col space-y-8 text-white text-xl">
-                    <Link href="/" className="text-2xl relative hover:text-neonBlue transition-all duration-200">
+                    <Link href="/home" className="text-2xl relative hover:text-neonBlue transition-all duration-200">
                         <FaHome />
                         <div className="absolute left-0 bottom-[-2px] w-full h-[2px] bg-neonBlue transform scale-x-0 hover:scale-x-100 transition-transform duration-300"></div>
                     </Link>
