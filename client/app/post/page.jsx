@@ -4,11 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image'; // Import Next.js Image component
 
 export default function Chat() {
-  const [message, setMessage] = useState('');
-  const [chatId, setChatId] = useState(0);
-  const [character, setCharacter] = useState('');
   const [imageUrls, setImageUrls] = useState('');
-  const [responses, setResponses] = useState([]);
   const [chatStarted, setChatStarted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -60,16 +56,13 @@ export default function Chat() {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      console.log(data);
-      console.log(data.chatId);
-      console.log(data.finalResponse);
       setChatStarted(true);
-      // setImageUrls('');
     } catch (error) {
       console.error('Error starting chat:', error);
       setError('Failed to start chat. Please try again.');
     } finally {
       setIsLoading(false);
+      setImageUrls('')
     }
   };
 
@@ -93,6 +86,11 @@ export default function Chat() {
           ))}
         </div>
         {error && <div className="text-red-500 mb-2">{error}</div>}
+        {chatStarted  && (
+          <div className="text-green-500 mb-2">
+            Posted Sucessfully: Recieved 5 comments
+          </div>
+        )}
         <form onSubmit={handleStartPost} className="flex flex-col">
           <textarea
             value={imageUrls}
